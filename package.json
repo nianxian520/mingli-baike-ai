@@ -1,0 +1,63 @@
+{
+  "name": "mingli-baike-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "命理百科 AI - 确定性八字引擎 + 结构化命理知识库 + AI解释器 + SEO百科",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@prisma/client": "5.18.0",
+    "@prisma/adapter-neon": "5.18.0",
+    "@neondatabase/serverless": "0.10.0",
+    "lunar-javascript": "1.6.12",
+    "zod": "3.23.8",
+    "openai": "4.56.0",
+    "date-fns": "3.6.0",
+    "next-themes": "0.3.0",
+    "clsx": "2.1.1",
+    "tailwind-merge": "2.5.2",
+    "class-variance-authority": "0.7.0",
+    "lucide-react": "0.439.0",
+    "@radix-ui/react-slot": "1.1.0",
+    "@radix-ui/react-label": "2.1.0",
+    "@radix-ui/react-select": "2.1.1",
+    "@radix-ui/react-tabs": "1.1.1",
+    "@radix-ui/react-tooltip": "1.1.2"
+  },
+  "devDependencies": {
+    "typescript": "5.5.4",
+    "prisma": "5.18.0",
+    "tsx": "4.19.0",
+    "@types/node": "20.16.5",
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
+    "tailwindcss": "3.4.10",
+    "postcss": "8.4.45",
+    "autoprefixer": "10.4.20",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.5",
+    "vitest": "2.0.5",
+    "@playwright/test": "1.47.0"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}

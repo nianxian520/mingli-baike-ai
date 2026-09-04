@@ -1,0 +1,128 @@
+[
+  {
+    "code": "R-MARRIAGE-001",
+    "category": "marriage",
+    "subcategory": "spouse_palace",
+    "name": "夫妻宫逢冲·婚姻动荡",
+    "description": "日支(夫妻宫)被其他柱地支冲, 主婚姻动荡",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        {
+          "op": "HAS_INTERACTION",
+          "type": "CLASH",
+          "positions": ["day"]
+        }
+      ]
+    },
+    "priority": 78,
+    "confidence": 0.65,
+    "tags": ["婚姻", "夫妻宫", "冲"],
+    "source": "三命通会·论六亲"
+  },
+  {
+    "code": "R-MARRIAGE-002",
+    "category": "marriage",
+    "subcategory": "spouse_palace",
+    "name": "夫妻宫逢合·姻缘至",
+    "description": "日支(夫妻宫)与其他柱地支六合/三合, 主姻缘至",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        {
+          "op": "OR",
+          "children": [
+            {
+              "op": "HAS_INTERACTION",
+              "type": "COMBINATION_2",
+              "positions": ["day"]
+            },
+            {
+              "op": "HAS_INTERACTION",
+              "type": "HALF_COMBINATION",
+              "positions": ["day"]
+            }
+          ]
+        }
+      ]
+    },
+    "priority": 70,
+    "confidence": 0.6,
+    "tags": ["婚姻", "夫妻宫", "合"],
+    "source": "三命通会·论六亲"
+  },
+  {
+    "code": "R-MARRIAGE-003",
+    "category": "marriage",
+    "subcategory": "spouse_star",
+    "name": "男命财星为妻·财星明现",
+    "description": "男命以财星为妻星, 财星明现且不受伤, 主妻贤",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "EQ", "path": "input.gender", "value": "MALE" },
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "正财" },
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "偏财" },
+            { "op": "TEN_GOD_AT", "position": "hour", "tenGod": "正财" },
+            { "op": "TEN_GOD_AT", "position": "hour", "tenGod": "偏财" }
+          ]
+        }
+      ]
+    },
+    "priority": 65,
+    "confidence": 0.55,
+    "tags": ["婚姻", "妻星", "财星"],
+    "source": "滴天髓·论妻"
+  },
+  {
+    "code": "R-MARRIAGE-004",
+    "category": "marriage",
+    "subcategory": "spouse_star",
+    "name": "女命官星为夫·官星明现",
+    "description": "女命以官星为夫星, 官星明现且不受伤, 主夫荣",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "EQ", "path": "input.gender", "value": "FEMALE" },
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "正官" },
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "七杀" },
+            { "op": "TEN_GOD_AT", "position": "hour", "tenGod": "正官" }
+          ]
+        }
+      ]
+    },
+    "priority": 65,
+    "confidence": 0.55,
+    "tags": ["婚姻", "夫星", "官星"],
+    "source": "滴天髓·论夫"
+  },
+  {
+    "code": "R-MARRIAGE-005",
+    "category": "marriage",
+    "subcategory": "spouse_palace",
+    "name": "日支坐比劫·争婚",
+    "description": "日支为比肩或劫财, 主夫妻宫被同类占据, 易争婚",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "day", "tenGod": "比肩" },
+            { "op": "TEN_GOD_AT", "position": "day", "tenGod": "劫财" }
+          ]
+        }
+      ]
+    },
+    "priority": 60,
+    "confidence": 0.5,
+    "tags": ["婚姻", "比劫", "争婚"],
+    "source": "三命通会·论六亲"
+  }
+]

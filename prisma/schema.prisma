@@ -1,0 +1,352 @@
+// 命理百科 AI · Prisma Schema
+// DataSource: PostgreSQL (Neon serverless)
+// 设计原则：所有外键加索引；chart_hash/request_hash 唯一索引用于缓存命中
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverApis"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")     // 运行时：Neon pooler (HTTP driver 友好)
+  directUrl = env("DIRECT_URL")      // 迁移：Neon 直连
+}
+
+// ============================================================
+// 用户与出生档案
+// ============================================================
+
+model User {
+  id            String        @id @default(cuid())
+  email         String?       @unique
+  phone         String?
+  name          String?
+  passwordHash  String?
+  role          Role           @default(USER)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  birthProfiles BirthProfile[]
+
+  @@index([email])
+  @@index([phone])
+  @@map("users")
+}
+
+enum Role {
+  USER
+  EDITOR
+  ADMIN
+}
+
+model BirthProfile {
+  id                 String       @id @default(cuid())
+  userId             String?      @map("user_id")
+  name               String // 档案名称(本人/父亲/母亲…)
+  gender             Gender
+  // 公历(已校正为真太阳时后的输入)
+  birthDate          DateTime     @map("birth_date") // ISO8601, 校正后 UTC
+  birthYear          Int          @map("birth_year") // 冗余, 便于检索
+  birthMonth         Int          @map("birth_month")
+  birthDay           Int          @map("birth_day")
+  birthHour          Int          @map("birth_hour") // 0-23 真太阳时小时
+  birthMinute        Int          @map("birth_minute") // 0-59
+  // 出生地点
+  birthPlace         String?      @map("birth_place")
+  longitude          Float // 经度
+  latitude           Float // 纬度
+  timezone           String // IANA 时区, 如 Asia/Shanghai
+  dstObserved        Boolean      @default(false) @map("dst_observed")
+  // 真太阳时校正
+  solarTimeOffsetMin Int          @map("solar_time_offset_min") // 经度校正分钟数
+  correctedHour      Int          @map("corrected_hour")
+  correctedMinute    Int          @map("corrected_minute")
+  // 关联
+  user               User?        @relation(fields: [userId], references: [id])
+  baziChart          BaziChart?
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([birthYear, birthMonth, birthDay])
+  @@index([birthDate])
+  @@map("birth_profiles")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+// ============================================================
+// 八字命盘
+// ============================================================
+
+model BaziChart {
+  id             String              @id @default(cuid())
+  birthProfileId String              @unique @map("birth_profile_id")
+  chartHash      String              @unique @map("chart_hash") // 输入哈希, 缓存命中
+  // 四柱(冗余存储, 便于检索)
+  yearPillar     String              @map("year_pillar") // 如 "甲子"
+  monthPillar    String              @map("month_pillar")
+  dayPillar      String              @map("day_pillar")
+  hourPillar     String?             @map("hour_pillar") // 子时跨日可能为 null
+  dayMaster      String              @map("day_master") // 日干
+  // 农历
+  lunarYear      Int                 @map("lunar_year")
+  lunarMonth     Int                 @map("lunar_month")
+  lunarDay       Int                 @map("lunar_day")
+  isLeapMonth    Boolean             @default(false) @map("is_leap_month")
+  // 节气
+  currentJieqi   String              @map("current_jieqi")
+  prevJieqiTime  DateTime            @map("prev_jieqi_time")
+  nextJieqiTime  DateTime            @map("next_jieqi_time")
+  // 全量结构化 JSON (BaziJson, 见 types/bazi.ts)
+  fullJson       Json                @map("full_json")
+  // 关联
+  birthProfile   BirthProfile        @relation(fields: [birthProfileId], references: [id])
+  daYuns         DaYun[]
+  aiRecords      AIAnalysisRecord[]
+  createdAt      DateTime            @default(now()) @map("created_at")
+
+  @@index([birthProfileId])
+  @@index([dayMaster])
+  @@index([chartHash])
+  @@map("bazi_charts")
+}
+
+model DaYun {
+  id          String    @id @default(cuid())
+  baziChartId String    @map("bazi_chart_id")
+  index       Int // 第几步大运 (1-10)
+  pillar      String // 大运干支
+  startAge    Int       @map("start_age")
+  endAge      Int       @map("end_age")
+  startYear   Int       @map("start_year") // 公历起始年
+  endYear     Int       @map("end_year")
+  stem        String
+  branch      String
+  baziChart   BaziChart @relation(fields: [baziChartId], references: [id], onDelete: Cascade)
+  liuNians    LiuNian[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([baziChartId])
+  @@index([startYear])
+  @@map("da_yuns")
+}
+
+model LiuNian {
+  id          String    @id @default(cuid())
+  dayunId     String    @map("dayun_id")
+  baziChartId String    @map("bazi_chart_id") // 冗余便于直接查
+  year        Int // 公历年
+  age         Int // 虚岁
+  pillar      String // 流年干支
+  stem        String
+  branch      String
+  dayun       DaYun     @relation(fields: [dayunId], references: [id], onDelete: Cascade)
+  baziChart   BaziChart @relation(fields: [baziChartId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([dayunId])
+  @@index([baziChartId])
+  @@index([year])
+  @@map("liu_nians")
+}
+
+// ============================================================
+// 命理规则与断语
+// ============================================================
+
+model Rule {
+  id            String           @id @default(cuid())
+  code          String           @unique // 如 R-CAREER-001
+  category      String // 事业/财运/婚姻/健康/性格/学业/六亲/格局/五行/神煞
+  subcategory   String?          @map("subcategory")
+  name          String
+  description   String?
+  conditions    Json // 结构化条件 DSL (见 engine/rule-dsl.ts)
+  priority      Int              @default(50) // 0-100, 越大越优先
+  confidence    Float            @default(0.5) // 0-1
+  tags          String[]
+  source        String?
+  enabled       Boolean          @default(true)
+  ruleStatements RuleStatement[]
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  @@index([category, subcategory])
+  @@index([priority])
+  @@index([enabled])
+  @@map("rules")
+}
+
+model Statement {
+  id             String           @id @default(cuid())
+  code           String           @unique // 如 S-CAREER-001
+  category       String
+  subcategory    String?          @map("subcategory")
+  statement      String // 断语文本
+  interpretation String?          @map("interpretation") // 现代白话解读(可选)
+  sourceId       String?          @map("source_id") // 古籍 ID
+  source         String? // 出处冗余(书名·篇名)
+  tags           String[]
+  conditions     Json? // 可选: 断语自带的命中条件
+  priority       Int              @default(50)
+  confidence     Float            @default(0.5)
+  enabled        Boolean          @default(true)
+  classic        Classic?          @relation(fields: [sourceId], references: [id])
+  ruleStatements RuleStatement[]
+  statementNodes StatementNode[]
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  @@index([category, subcategory])
+  @@index([sourceId])
+  @@index([priority])
+  @@index([enabled])
+  @@map("statements")
+}
+
+model RuleStatement {
+  ruleId      String
+  statementId String
+  rule        Rule      @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  statement   Statement @relation(fields: [statementId], references: [id], onDelete: Cascade)
+
+  @@id([ruleId, statementId])
+  @@index([statementId])
+  @@map("rule_statements")
+}
+
+model Classic {
+  id          String     @id @default(cuid())
+  title       String     @unique
+  dynasty     String?
+  author      String?
+  description String?
+  statements  Statement[]
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  @@index([title])
+  @@map("classics")
+}
+
+// ============================================================
+// 知识节点(百科树)
+// ============================================================
+
+model KnowledgeNode {
+  id              String           @id @default(cuid())
+  slug            String           @unique // URL 友好标识 如 "jia-wood"
+  parentId        String?          @map("parent_id")
+  type            NodeType
+  title           String
+  summary         String // 摘要 (meta description 用)
+  content         String // 正文 Markdown
+  stem            String? // 关联天干
+  branch          String? // 关联地支
+  ganzhi          String? // 关联干支
+  tenGod          String?          @map("ten_god")
+  element         String? // 五行
+  seoTitle        String?          @map("seo_title")
+  seoDescription  String?          @map("seo_description")
+  parent          KnowledgeNode?    @relation("NodeTree", fields: [parentId], references: [id])
+  children        KnowledgeNode[]   @relation("NodeTree")
+  statementNodes  StatementNode[]
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([parentId])
+  @@index([type])
+  @@index([slug])
+  @@index([stem])
+  @@index([branch])
+  @@index([ganzhi])
+  @@map("knowledge_nodes")
+}
+
+enum NodeType {
+  TIAN_GAN
+  DI_ZHI
+  GAN_ZHI
+  SHI_SHEN
+  WU_XING
+  DA_YUN
+  CONCEPT
+}
+
+model StatementNode {
+  statementId String
+  nodeId      String
+  statement   Statement      @relation(fields: [statementId], references: [id], onDelete: Cascade)
+  node        KnowledgeNode   @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  @@id([statementId, nodeId])
+  @@index([nodeId])
+  @@map("statement_nodes")
+}
+
+// ============================================================
+// AI 与审计
+// ============================================================
+
+model AIAnalysisRecord {
+  id              String          @id @default(cuid())
+  baziChartId     String          @map("bazi_chart_id")
+  promptVersionId String         @map("prompt_version_id")
+  inputHash       String          @map("input_hash") // (chartId+rules+statements) 哈希
+  inputSnapshot   Json            @map("input_snapshot") // 注入 AI 的结构化数据快照
+  outputText      String          @map("output_text")
+  outputTokens    Int             @map("output_tokens")
+  inputTokens     Int             @map("input_tokens")
+  durationMs      Int             @map("duration_ms")
+  provider        String // qwen/deepseek
+  model           String
+  succeeded       Boolean         @default(true)
+  errorMessage    String?          @map("error_message")
+  baziChart       BaziChart       @relation(fields: [baziChartId], references: [id], onDelete: Cascade)
+  promptVersion   AIPromptVersion @relation(fields: [promptVersionId], references: [id])
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  @@index([baziChartId])
+  @@index([promptVersionId])
+  @@index([inputHash])
+  @@index([createdAt])
+  @@map("ai_analysis_records")
+}
+
+model AIPromptVersion {
+  id          String              @id @default(cuid())
+  version     String              @unique // "v1.0.0"
+  name        String
+  template    String // prompt 模板(含变量占位符)
+  variables   String[]
+  active      Boolean             @default(false) // 同时只有一个 active
+  description String?
+  aiRecords   AIAnalysisRecord[]
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  @@index([active])
+  @@map("ai_prompt_versions")
+}
+
+model APICallLog {
+  id           String   @id @default(cuid())
+  endpoint     String
+  method       String
+  requestHash  String   @map("request_hash")
+  statusCode   Int      @map("status_code")
+  durationMs   Int      @map("duration_ms")
+  userId       String?  @map("user_id")
+  ip           String?
+  userAgent    String?  @map("user_agent")
+  errorMessage String?  @map("error_message")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([endpoint, createdAt])
+  @@index([requestHash])
+  @@index([userId])
+  @@map("api_call_logs")
+}

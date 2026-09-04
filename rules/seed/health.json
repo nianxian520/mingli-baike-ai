@@ -1,0 +1,80 @@
+[
+  {
+    "code": "R-HEALTH-001",
+    "category": "health",
+    "subcategory": "organs",
+    "name": "火旺无制·心血管疾",
+    "description": "火行过旺且无水制, 主心血管/眼目之疾",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "WUXING_DOMINANT", "elements": ["fire"] },
+        { "op": "WUXING_MISSING", "elements": ["water"] }
+      ]
+    },
+    "priority": 70,
+    "confidence": 0.6,
+    "tags": ["健康", "火旺", "心血管"],
+    "source": "黄帝内经·五运六气"
+  },
+  {
+    "code": "R-HEALTH-002",
+    "category": "health",
+    "subcategory": "organs",
+    "name": "水弱缺木·肝肾不足",
+    "description": "水行极弱且缺木, 水主肾, 木主肝, 主肝肾不足",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "WUXING_MISSING", "elements": ["water"] },
+        { "op": "WUXING_MISSING", "elements": ["wood"] }
+      ]
+    },
+    "priority": 65,
+    "confidence": 0.55,
+    "tags": ["健康", "水弱", "肝肾"],
+    "source": "黄帝内经·五运六气"
+  },
+  {
+    "code": "R-HEALTH-003",
+    "category": "health",
+    "subcategory": "organs",
+    "name": "木旺克土·脾胃弱",
+    "description": "木行过旺克土过重, 土主脾胃, 主脾胃之疾",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "WUXING_DOMINANT", "elements": ["wood"] },
+        {
+          "op": "OR",
+          "children": [
+            { "op": "WUXING_MISSING", "elements": ["earth"] },
+            { "op": "DAY_MASTER_STRENGTH", "level": "JUE" }
+          ]
+        }
+      ]
+    },
+    "priority": 68,
+    "confidence": 0.6,
+    "tags": ["健康", "木旺", "脾胃"],
+    "source": "黄帝内经·五运六气"
+  },
+  {
+    "code": "R-HEALTH-004",
+    "category": "health",
+    "subcategory": "organs",
+    "name": "金弱缺土·肺气虚",
+    "description": "金行极弱且缺土(土生金), 主肺气不足",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "WUXING_MISSING", "elements": ["metal"] },
+        { "op": "WUXING_MISSING", "elements": ["earth"] }
+      ]
+    },
+    "priority": 60,
+    "confidence": 0.5,
+    "tags": ["健康", "金弱", "肺"],
+    "source": "黄帝内经·五运六气"
+  }
+]

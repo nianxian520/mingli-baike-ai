@@ -1,0 +1,99 @@
+[
+  {
+    "code": "R-PERSONALITY-001",
+    "category": "personality",
+    "subcategory": "day_master",
+    "name": "甲木日主·刚直仁慈",
+    "description": "日干为甲木, 木主仁, 性刚直, 有领导力",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "STEM_IS", "position": "day", "stem": "甲" }
+      ]
+    },
+    "priority": 60,
+    "confidence": 0.65,
+    "tags": ["性格", "甲木", "日主"],
+    "source": "滴天髓·论干"
+  },
+  {
+    "code": "R-PERSONALITY-002",
+    "category": "personality",
+    "subcategory": "day_master",
+    "name": "乙木日主·柔韧仁和",
+    "description": "日干为乙木, 阴木, 性柔韧, 善变通",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "STEM_IS", "position": "day", "stem": "乙" }
+      ]
+    },
+    "priority": 60,
+    "confidence": 0.65,
+    "tags": ["性格", "乙木", "日主"],
+    "source": "滴天髓·论干"
+  },
+  {
+    "code": "R-PERSONALITY-003",
+    "category": "personality",
+    "subcategory": "day_master",
+    "name": "丙火日主·热情礼让",
+    "description": "日干为丙火, 阳火, 主礼, 性热情外向",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "STEM_IS", "position": "day", "stem": "丙" }
+      ]
+    },
+    "priority": 60,
+    "confidence": 0.65,
+    "tags": ["性格", "丙火", "日主"],
+    "source": "滴天髓·论干"
+  },
+  {
+    "code": "R-PERSONALITY-004",
+    "category": "personality",
+    "subcategory": "ten_god",
+    "name": "七杀贴身·刚毅果断",
+    "description": "日干旁有七杀贴身, 性刚毅果决, 适合武职",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "七杀" },
+            { "op": "TEN_GOD_AT", "position": "hour", "tenGod": "七杀" }
+          ]
+        }
+      ]
+    },
+    "priority": 65,
+    "confidence": 0.6,
+    "tags": ["性格", "七杀"],
+    "source": "子平真诠·论杀"
+  },
+  {
+    "code": "R-PERSONALITY-005",
+    "category": "personality",
+    "subcategory": "ten_god",
+    "name": "正印贴身·聪慧好学",
+    "description": "日干旁有正印贴身, 主聪慧好学, 慈悲心",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "正印" },
+            { "op": "TEN_GOD_AT", "position": "hour", "tenGod": "正印" }
+          ]
+        }
+      ]
+    },
+    "priority": 63,
+    "confidence": 0.6,
+    "tags": ["性格", "正印", "聪慧"],
+    "source": "子平真诠·论印"
+  }
+]

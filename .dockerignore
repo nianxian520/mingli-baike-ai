@@ -1,0 +1,30 @@
+# Next.js / Node
+node_modules
+.next
+out
+dist
+
+# Env
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Git / IDE / OS
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+*.log
+
+# Test / Docs
+tests
+README.md
+.trae
+docker-compose*.yml
+!docker-compose.prod.yml
+
+# 部署脚本目录 (不在镜像内, 由 VPS 层使用)
+deploy

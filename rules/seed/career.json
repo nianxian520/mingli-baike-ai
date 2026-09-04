@@ -1,0 +1,131 @@
+[
+  {
+    "code": "R-CAREER-001",
+    "category": "career",
+    "subcategory": "official",
+    "name": "日主偏弱·官杀旺",
+    "description": "日主偏弱且月令官杀透干, 官杀制身过重, 事业多阻",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "DAY_MASTER_STRENGTH", "level": "RUO" },
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "七杀" },
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "正官" }
+          ]
+        }
+      ]
+    },
+    "priority": 80,
+    "confidence": 0.7,
+    "tags": ["事业", "官杀"],
+    "source": "子平真诠·论官星"
+  },
+  {
+    "code": "R-CAREER-002",
+    "category": "career",
+    "subcategory": "talent",
+    "name": "食伤泄秀·才华显",
+    "description": "日主旺且有食神/伤官泄秀, 主有才华, 适合文职/技艺",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        {
+          "op": "OR",
+          "children": [
+            { "op": "DAY_MASTER_STRENGTH", "level": "WANG" },
+            { "op": "DAY_MASTER_STRENGTH", "level": "XIANG" }
+          ]
+        },
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "食神" },
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "伤官" },
+            { "op": "TEN_GOD_AT", "position": "year", "tenGod": "食神" },
+            { "op": "TEN_GOD_AT", "position": "hour", "tenGod": "伤官" }
+          ]
+        }
+      ]
+    },
+    "priority": 75,
+    "confidence": 0.75,
+    "tags": ["事业", "食伤", "才艺"],
+    "source": "穷通宝鉴·论食伤"
+  },
+  {
+    "code": "R-CAREER-003",
+    "category": "career",
+    "subcategory": "wealth",
+    "name": "财旺身强·能任大财",
+    "description": "日主强且财星有力, 主能任大财, 适合经商理财",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        {
+          "op": "OR",
+          "children": [
+            { "op": "DAY_MASTER_STRENGTH", "level": "WANG" },
+            { "op": "DAY_MASTER_STRENGTH", "level": "XIANG" }
+          ]
+        },
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "正财" },
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "偏财" },
+            { "op": "TEN_GOD_AT", "position": "day", "tenGod": "正财" },
+            { "op": "TEN_GOD_AT", "position": "hour", "tenGod": "偏财" }
+          ]
+        }
+      ]
+    },
+    "priority": 78,
+    "confidence": 0.7,
+    "tags": ["事业", "财运"],
+    "source": "滴天髓·论财"
+  },
+  {
+    "code": "R-CAREER-004",
+    "category": "career",
+    "subcategory": "patterns",
+    "name": "正官格·仕途顺",
+    "description": "成正官格且无伤官破格, 主仕途顺遂",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "PATTERN_IS", "pattern": "正官格" }
+      ]
+    },
+    "priority": 70,
+    "confidence": 0.6,
+    "tags": ["事业", "格局", "仕途"],
+    "source": "子平真诠·论官"
+  },
+  {
+    "code": "R-CAREER-005",
+    "category": "career",
+    "subcategory": "patterns",
+    "name": "七杀格·武贵",
+    "description": "成七杀格且有食神制杀, 主武贵, 适合军警执法",
+    "conditions": {
+      "op": "AND",
+      "children": [
+        { "op": "PATTERN_IS", "pattern": "七杀格" },
+        {
+          "op": "OR",
+          "children": [
+            { "op": "TEN_GOD_AT", "position": "month", "tenGod": "食神" },
+            { "op": "TEN_GOD_AT", "position": "hour", "tenGod": "食神" }
+          ]
+        }
+      ]
+    },
+    "priority": 72,
+    "confidence": 0.65,
+    "tags": ["事业", "格局", "武贵"],
+    "source": "子平真诠·论杀"
+  }
+]
